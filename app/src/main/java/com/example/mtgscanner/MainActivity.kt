@@ -277,16 +277,20 @@ val cardNameCandidate =
                     collectorMatch?.groupValues?.get(1)
                         ?: "見つかりませんでした"
 
-                resultTextView.text = """
-                    カード名候補:
-                    $cardNameCandidate
+                        val debugLines =
+    visionText.textBlocks
+        .flatMap { block -> block.lines }
+        .joinToString("\n") { line ->
+            val box = line.boundingBox
+            "${line.text}  y=${box?.top}"
+        }
 
-                    コレクター番号候補:
-                    $collectorNumber
+resultTextView.text = """
+画像高さ: $imageHeight
 
-                    --- OCR全文 ---
-                    $fullText
-                """.trimIndent()
+--- 認識位置 ---
+$debugLines
+""".trimIndent()
             }
             .addOnFailureListener { exception ->
                 resultTextView.text =
