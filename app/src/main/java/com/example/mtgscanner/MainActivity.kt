@@ -19,6 +19,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
 import java.io.File
+import android.graphics.BitmapFactory
 
 class MainActivity : ComponentActivity() {
 
@@ -222,6 +223,19 @@ private fun runOcr(photoFile: File) {
         recognizer.process(image)
             .addOnSuccessListener { visionText ->
 
+            val bitmapOptions =
+    BitmapFactory.Options().apply {
+        inJustDecodeBounds = true
+    }
+
+BitmapFactory.decodeFile(
+    photoFile.absolutePath,
+    bitmapOptions
+)
+
+val imageWidth = bitmapOptions.outWidth
+val imageHeight = bitmapOptions.outHeight
+
                 val fullText = visionText.text
 
                 if (fullText.isBlank()) {
@@ -235,8 +249,23 @@ private fun runOcr(photoFile: File) {
                     .map { line -> line.trim() }
                     .filter { line -> line.isNotBlank() }
 
-                val cardNameCandidate =
-                    lines.firstOrNull() ?: "不明"
+                    val titleLines =
+    visionText.textBlocks
+        .flatMap { block -> block.lines }
+        .filter { line ->
+            val box = line.boundingBox
+            box != null &&
+            box.top < imageHeight * 0.20
+        }
+        .sortedBy { line ->
+            line.boundingBox?.top ?: Int.MAX_VALUE
+        }
+
+val cardNameCandidate =
+    titleLines
+        .joinToString(" ") { line -> line.text }
+        .trim()
+        .ifBlank { "不明" }
 
                 val collectorRegex =
                     Regex("""\b(\d{1,4})\s*/\s*(\d{1,4})\b""")
