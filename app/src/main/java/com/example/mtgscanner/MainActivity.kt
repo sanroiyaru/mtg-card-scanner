@@ -249,13 +249,15 @@ val imageHeight = bitmapOptions.outHeight
                     .map { line -> line.trim() }
                     .filter { line -> line.isNotBlank() }
 
-                    val titleLines =
+val titleLines =
     visionText.textBlocks
         .flatMap { block -> block.lines }
         .filter { line ->
             val box = line.boundingBox
+
             box != null &&
-            box.top < imageHeight * 0.20
+            box.top > imageHeight * 0.20 &&
+            box.top < imageHeight * 0.40
         }
         .sortedBy { line ->
             line.boundingBox?.top ?: Int.MAX_VALUE
@@ -286,10 +288,14 @@ val cardNameCandidate =
         }
 
 resultTextView.text = """
-画像高さ: $imageHeight
+カード名候補:
+$cardNameCandidate
 
---- 認識位置 ---
-$debugLines
+コレクター番号候補:
+$collectorNumber
+
+--- OCR全文 ---
+$fullText
 """.trimIndent()
             }
             .addOnFailureListener { exception ->
