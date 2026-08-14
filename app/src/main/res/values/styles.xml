@@ -1,3 +1,8 @@
 <resources>
-    <style name="Theme.MTGScanner" parent="@android:style/Theme.Material.Light.NoActionBar" />
+    <style name="Theme.MTGScanner" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">#090C10</item>
+        <item name="android:colorAccent">#D6A84B</item>
+    </style>
 </resources>
